@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShapeDesigner AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">AI</div>
+            <div>
+                <strong>ShapeDesigner AI</strong>
+                <span>Graph Theory Meets Creativity</span>
+            </div>
+        </div>
+        <nav class="side-nav">
+            <button class="nav-btn active" data-tab="generator"><i data-lucide="zap"></i><span>Generator</span></button>
+            <button class="nav-btn" data-tab="comparison"><i data-lucide="columns-3"></i><span>Comparison</span></button>
+            <button class="nav-btn" data-tab="education"><i data-lucide="graduation-cap"></i><span>Education</span></button>
+            <button class="nav-btn" data-tab="architecture"><i data-lucide="workflow"></i><span>Architecture</span></button>
+        </nav>
+        <div class="project-note">
+            <strong>About this project</strong>
+            <p>AI-assisted shape design that validates graphs, detects Eulerian and Hamiltonian behavior, and renders final concepts with Free AI Image Generator.</p>
+        </div>
+    </aside>
+
+    <main class="app-shell">
+        <header class="topbar">
+            <div>
+                <h1>AI Robot Geometric Drawer</h1>
+                <p>Design, analyze, visualize, and render geometric structures using graph theory plus Free AI Image Generator.</p>
+            </div>
+            <div class="top-actions">
+                <span class="model-pill">Free AI Render Ready</span>
+                <button id="theme-toggle" class="icon-button" aria-label="Toggle theme"><i data-lucide="sun"></i></button>
+            </div>
+        </header>
+
+        <section id="generator" class="tab-content active">
+            <div class="generator-grid">
+                <form id="design-form" class="panel controls-panel">
+                    <div class="panel-title">
+                        <i data-lucide="sliders-horizontal"></i>
+                        <h2>Design Constraints</h2>
+                    </div>
+
+                    <label class="field">
+                        <span>Structure prompt</span>
+                        <input id="description" type="text" placeholder="cube, cone, sphere, torus, glass pavilion">
+                    </label>
+
+                    <label class="field">
+                        <span>Curve / shape surface</span>
+                        <select id="curve-type">
+                            <option value="cube">Cube</option>
+                            <option value="cone">Cone</option>
+                            <option value="sphere">Sphere</option>
+                            <option value="cylinder">Cylinder</option>
+                            <option value="torus">Torus</option>
+                            <option value="pyramid">Pyramid</option>
+                            <option value="prism">Prism</option>
+                            <option value="spiral">Spiral / Helix</option>
+                            <option value="octahedron">Octahedron</option>
+                            <option value="dodecahedron">Dodecahedron</option>
+                            <option value="hybrid">Hybrid (Cylinder + Cap)</option>
+                        </select>
+                    </label>
+
+                    <div class="split-fields">
+                        <label class="field">
+                            <span>Vertices (V)</span>
+                            <input id="vertices" type="number" min="3" max="50" value="8">
+                        </label>
+                        <label class="field">
+                            <span>Edges (E)</span>
+                            <input id="edges" type="number" min="3" max="100" value="12">
+                        </label>
+                    </div>
+
+                    <label class="field">
+                        <span>Design category</span>
+                        <select id="category">
+                            <option>House Building</option>
+                            <option>Pavilion Structure</option>
+                            <option>Tower Structure</option>
+                            <option>Bridge Structure</option>
+                            <option>Robotics Layout</option>
+                            <option>Product Design</option>
+                            <option>Space Habitat</option>
+                            <option>Research Facility</option>
+                        </select>
+                    </label>
+
+                    <div class="switch-row">
+                        <label><input id="req-eulerian" type="checkbox"> <span>Require Eulerian circuit</span></label>
+                        <label><input id="req-hamiltonian" type="checkbox" checked> <span>Require Hamiltonian cycle</span></label>
+                        <label><input id="enable-image" type="checkbox" checked> <span>Generate Free AI render</span></label>
+                    </div>
+
+                    <div class="split-fields">
+                        <label class="field">
+                            <span>Image style</span>
+                            <select id="image-style">
+                                <option value="natural">Natural</option>
+                                <option value="vivid">Vivid</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>Quality</span>
+                            <select id="image-quality">
+                                <option value="standard">Standard</option>
+                                <option value="hd">HD</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <label class="field">
+                        <span>AI render direction</span>
+                        <textarea id="image-prompt" rows="3" placeholder="modern glass house, carbon fiber shell, warm studio lighting"></textarea>
+                    </label>
+
+                    <button class="primary-button" id="generate-btn" type="submit"><i data-lucide="sparkles"></i> Generate Strong Design</button>
+                    <div id="status-message" class="status-box hidden"></div>
+                </form>
+
+                <section class="panel graph-panel">
+                    <div class="panel-title">
+                        <i data-lucide="share-2"></i>
+                        <h2>1. Graph Representation (2D)</h2>
+                        <button id="save-jpg-btn" class="ghost-button" disabled><i data-lucide="download"></i> Save JPG</button>
+                    </div>
+                    <div id="graph-container">
+                        <div class="empty-state">
+                            <i data-lucide="box"></i>
+                            <strong>Your graph will appear here</strong>
+                            <span>Choose a curve and generate.</span>
+                        </div>
+                    </div>
+                    <div class="analysis-strip">
+                        <div><span>Vertices</span><strong id="metric-v">-</strong></div>
+                        <div><span>Edges</span><strong id="metric-e">-</strong></div>
+                        <div><span>Connected</span><strong id="metric-connected">-</strong></div>
+                        <div><span>Eulerian</span><strong id="metric-eulerian">-</strong></div>
+                        <div><span>Hamiltonian</span><strong id="metric-hamiltonian">-</strong></div>
+                    </div>
+                </section>
+
+                <section class="panel render-panel">
+                    <div class="panel-title">
+                        <i data-lucide="image"></i>
+                        <h2>2. 3D Structure (AI Generated)</h2>
+                        <button id="save-ai-btn" class="ghost-button" disabled><i data-lucide="download"></i> Save AI Image</button>
+                    </div>
+                    <div id="render-container">
+                        <div class="ai-placeholder">
+                            <div class="shape-preview"></div>
+                            <strong>AI render area</strong>
+                            <span>API image appears here when enabled.</span>
+                        </div>
+                    </div>
+                    <article class="render-copy">
+                        <h3 id="shape-title">Optimized Shape Output</h3>
+                        <p id="design-interpretation">Generated designs combine graph validity with AI concept rendering.</p>
+                    </article>
+                </section>
+            </div>
+
+            <section class="panel lower-dashboard">
+                <div class="panel-title">
+                    <i data-lucide="bot"></i>
+                    <h2>3. AI Robot Drawing Simulation</h2>
+                </div>
+                <div class="step-track" id="step-track"></div>
+                <div class="report-grid">
+                    <div>
+                        <h3>Adjacency List</h3>
+                        <pre id="adjacency-list">Generate a design to view connections.</pre>
+                    </div>
+                    <div>
+                        <h3>Path Summary</h3>
+                        <p id="path-summary">Eulerian and Hamiltonian checks will be reported here.</p>
+                    </div>
+                    <div>
+                        <h3>Overall Result</h3>
+                        <div id="overall-result" class="result-badge pending">Waiting</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section id="comparison" class="tab-content">
+            <div class="comparison-board">
+                <h2>Comparison Between Manual and AI-Generated Designs</h2>
+                <div class="compare-grid">
+                    <article class="compare-column manual">
+                        <h3><i data-lucide="user"></i> Manual Design</h3>
+                        <ul>
+                            <li>Hand-drawn graph can be irregular.</li>
+                            <li>Hard to modify after constraints change.</li>
+                            <li>No instant Eulerian or Hamiltonian validation.</li>
+                            <li>Higher time, effort, and error risk.</li>
+                        </ul>
+                    </article>
+                    <div class="versus">VS</div>
+                    <article class="compare-column ai">
+                        <h3><i data-lucide="brain-circuit"></i> AI-Generated Design</h3>
+                        <ul>
+                            <li>Graph is generated with exact vertices and edges.</li>
+                            <li>Constraints are validated before design mapping.</li>
+                            <li>DALL-E 3 creates final visual concept renders.</li>
+                            <li>Fast, accurate, optimized, and presentation-ready.</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="tab-content">
+            <div class="education-grid">
+                <article class="edu-panel">
+                    <h2>Hamiltonian Cycle in a Graph</h2>
+                    <p>A cycle that visits each vertex exactly once and returns to the starting vertex.</p>
+                    <div class="mini-graph hamiltonian-demo"></div>
+                    <ul>
+                        <li>Useful for route, outline, and structural loop design.</li>
+                        <li>Great for optimized tour-style paths.</li>
+                    </ul>
+                </article>
+                <article class="edu-panel">
+                    <h2>Eulerian Circuit in a Graph</h2>
+                    <p>A closed path that visits every edge exactly once and returns to the starting vertex.</p>
+                    <div class="mini-graph eulerian-demo"></div>
+                    <ul>
+                        <li>Useful for robot drawing without lifting the tool.</li>
+                        <li>All vertices must have even degree.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section id="architecture" class="tab-content">
+            <div class="flow-panel">
+                <h2>System Architecture</h2>
+                <div class="flow-step"><i data-lucide="file-input"></i><strong>1. User Input Shape</strong><span>Vertices, edges, constraints, category, and curve surface.</span></div>
+                <div class="flow-step"><i data-lucide="git-fork"></i><strong>2. Graph Conversion</strong><span>Create graph G(V, E), adjacency, and topology positions.</span></div>
+                <div class="flow-step"><i data-lucide="brain"></i><strong>3. AI Analysis</strong><span>Predict feasibility and prepare the DALL-E 3 design prompt.</span></div>
+                <div class="flow-step"><i data-lucide="route"></i><strong>4. Eulerian / Hamiltonian Algorithms</strong><span>Validate graph paths and cycle behavior.</span></div>
+                <div class="flow-step"><i data-lucide="box"></i><strong>5. Optimized Shape Output</strong><span>Render graph, AI concept image, report, and export.</span></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
