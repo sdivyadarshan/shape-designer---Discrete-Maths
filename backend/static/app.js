@@ -16,7 +16,7 @@ let lastGraph = null;
 let lastAiImageUrl = "";
 let rotX = -0.3;
 let rotY = 0.5;
-const API_BASE = window.location.protocol === "file:" ? "http://127.0.0.1:8001" : "";
+const API_BASE ="https://shape-designer-discrete-maths.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
